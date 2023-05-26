@@ -17,7 +17,7 @@ entity ALU is
         overflow_flag : out std_logic;
         FSM_EN_flag   : out std_logic;
         MODE_SEL_flag : out std_logic;
-        LOAD_EN_flag  : out std_logic;
+        LOAD_EN_flag  : out std_logic
     );
 end entity ALU;
 

@@ -181,7 +181,7 @@ begin
               CLK_ALU_CTRL <= '0';  -- Disable Clock for ALU
                 
             when S3 =>              -- Set values OP code for addition in ALU and Key by FSM 
-              FSM_ALU_CTRL <= '00000'; 
+              FSM_ALU_CTRL <= "00000"; 
               FSM_DATA_OUT <= ENKP(63 downto 32);    --(Ka,Km)
             
             when S4 =>             -- Enable Clock for ALU
@@ -192,7 +192,7 @@ begin
                 
             when S6 =>              -- Set values OP code for multiplication in ALU and Key by FSM 
               CLK_ALU_CTRL <= '0';
-              FSM_ALU_CTRL <= '11010';         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              FSM_ALU_CTRL <= "11010";         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
               FSM_DATA_OUT <= ENKP(31 downto 0);    --(Ka,Km)
                 
             when S7 =>              -- Enable Clock for ALU
@@ -202,7 +202,7 @@ begin
               CLK_ALU_CTRL <= '0';
                 
             when S9 =>              -- Set values OP code for Division in ALU and Key by FSM 
-              FSM_ALU_CTRL <= '00011'; 
+              FSM_ALU_CTRL <= "00011"; 
               FSM_DATA_OUT <= DCKP(63 downto 32);    --(Kd,Ks)
                 
             when S10 =>             -- Enable Clock for ALU
@@ -213,7 +213,7 @@ begin
                 
             when S12 =>             -- Set values OP code for Substraction in ALU and Key by FSM 
               CLK_ALU_CTRL <= '0';
-              FSM_ALU_CTRL <= '11011';         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              FSM_ALU_CTRL <= "11011";         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
               FSM_DATA_OUT <= DCKP(31 downto 0);    --(Kd,Ks)
                 
             when S13 =>              -- Enable Clock for ALU
@@ -228,8 +228,8 @@ begin
               VAR <= '0';
               
             when S16 =>
-              FSM_ALU_CTRL <= '00000'; 
-              FSM_DATA_OUT <= x"00000000"    
+              FSM_ALU_CTRL <= "00000"; 
+              FSM_DATA_OUT <= x"00000000";    
                 
             when S17 =>
               CLK_ALU_CTRL <= '1';
@@ -252,8 +252,8 @@ begin
               VAR <= '0';
                 
             when S23 =>
-              FSM_ALU_CTRL <= '00000'; 
-              FSM_DATA_OUT <= x"00000000"    
+              FSM_ALU_CTRL <= "00000"; 
+              FSM_DATA_OUT <= x"00000000";    
             
             when S24 =>
               CLK_ALU_CTRL <= '1';
@@ -272,12 +272,12 @@ begin
               CLK_ALU_CTRL <= '1';
                 
             when S29 =>
-              FSM_ALU_CTRL <= '11100';     --Set NOP in ALU that releses ALU from FSM Lock
+              FSM_ALU_CTRL <= "11100";     --Set NOP in ALU that releses ALU from FSM Lock
                     
             when others =>
               CLK_ALU_CTRL <= '1';       -- Default output value
-              FSM_ALU_CTRL <= '11100'; 
-              FSM_DATA_OUT <= x"00000000"
+              FSM_ALU_CTRL <= "11100"; 
+              FSM_DATA_OUT <= x"00000000";
                 
         end case;
     end process;

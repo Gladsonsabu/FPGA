@@ -23,7 +23,6 @@ end entity ALU;
 
 architecture Behavioral of ALU is
 begin
-
     process (operand_A, operand_B, OP_Code)
         variable temp_result : std_logic_vector(DATA_WIDTH - 1 downto 0);
         variable temp_carry  : std_logic;

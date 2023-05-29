@@ -101,7 +101,7 @@ begin
             when S14 =>
               if FSM_MODE = '0' then
                 next_state <= S15;    -- Ka Km key pair loading mode
-              elsif FSM_MODE = '0' then
+              elsif FSM_MODE = '1' then
                 next_state <= S22;    -- Kd Ks key pair loading mode
               else
                 next_state <= S0;       -- Protection case for Z or X signals if encountered system resets and goes to state 0
@@ -192,7 +192,7 @@ begin
                 
             when S6 =>              -- Set values OP code for multiplication in ALU and Key by FSM 
               CLK_ALU_CTRL <= '0';
-              FSM_ALU_CTRL <= "11010";         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              FSM_ALU_CTRL <= "11010";         -- Custom OP is used
               FSM_DATA_OUT <= ENKP(31 downto 0);    --(Ka,Km)
                 
             when S7 =>              -- Enable Clock for ALU
@@ -213,7 +213,7 @@ begin
                 
             when S12 =>             -- Set values OP code for Substraction in ALU and Key by FSM 
               CLK_ALU_CTRL <= '0';
-              FSM_ALU_CTRL <= "11011";         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              FSM_ALU_CTRL <= "11011";         -- Custom OP is used
               FSM_DATA_OUT <= DCKP(31 downto 0);    --(Kd,Ks)
                 
             when S13 =>              -- Enable Clock for ALU
@@ -229,7 +229,7 @@ begin
               
             when S16 =>
               FSM_ALU_CTRL <= "00000"; 
-              FSM_DATA_OUT <= x"00000000";    
+              FSM_DATA_OUT <= x"00000000";
                 
             when S17 =>
               CLK_ALU_CTRL <= '1';
@@ -253,7 +253,7 @@ begin
                 
             when S23 =>
               FSM_ALU_CTRL <= "00000"; 
-              FSM_DATA_OUT <= x"00000000";    
+              FSM_DATA_OUT <= x"00000000";  
             
             when S24 =>
               CLK_ALU_CTRL <= '1';

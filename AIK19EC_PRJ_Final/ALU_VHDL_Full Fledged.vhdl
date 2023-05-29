@@ -197,11 +197,18 @@ begin
                 FSM_EN_flag := 1;
                 MODE_SEL_flag := 0;
 
-            when "11001" =>
+            when "11000" =>
                 -- DAMS Decrypt Key Load
                 LOAD_EN_flag := 1;
                 FSM_EN_flag := 1;
                 MODE_SEL_flag := 1;
+
+            when "11001" =>
+                -- DAMS Disable and exit Similar to NOP but output is set to 0
+                temp_result := x"00000000";
+                LOAD_EN_flag := 0;
+                FSM_EN_flag := 0;
+                MODE_SEL_flag := 0;
                 
             when "11010" =>
                 -- DAMS Encrypt Key Load Alt Function
@@ -213,6 +220,7 @@ begin
 
             when "11100" =>
                 -- NOP Function
+                temp_result := operand_A;
                 LOAD_EN_flag := 0;
                 FSM_EN_flag := 0;
                 MODE_SEL_flag := 0;

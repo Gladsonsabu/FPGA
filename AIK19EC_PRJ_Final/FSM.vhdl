@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity FSM is
     port (
@@ -8,10 +9,10 @@ entity FSM is
         FSM_MODE: in std_logic;
         FSM_LD_EN: in std_logic;
         FSM_EN: in std_logic;
-        FSM_DATA_IN: in STD_LOGIC_VECTOR (31 downto 0);
-        FSM_ALU_CTRL: out STD_LOGIC_VECTOR (4 downto 0);
+        FSM_DATA_IN: in std_logic_vector (31 downto 0);
+        FSM_ALU_CTRL: out std_logic_vector (4 downto 0);
         CLK_ALU_CTRL: out std_logic;
-        FSM_DATA_OUT: out STD_LOGIC_VECTOR (31 downto 0)
+        FSM_DATA_OUT: out std_logic_vector (31 downto 0)
     );
 end entity FSM;
 
@@ -26,9 +27,10 @@ architecture behavioral of FSM is
     signal current_state, next_state: state_type;
 
     -- Define the internal variables
-    variable ENKP : unsigned(63 downto 0) := (others => '0');
-    variable DCKP : unsigned(63 downto 0) := (others => '0');
-    variable VAR : std_logic := '0';
+    signal ENKP : std_logic_vector(63 downto 0) := (others => '0');
+    signal DCKP : std_logic_vector(63 downto 0) := (others => '0');
+    signal VAR : std_logic := '0';
+    
 begin
     -- Define the state register
     process (clk, reset)
@@ -41,7 +43,7 @@ begin
     end process;
     
     -- Define the next state logic
-    process (current_state, input_signal)
+    process (current_state, FSM_EN)
     begin
         case current_state is
             when S0 =>
@@ -101,7 +103,7 @@ begin
             when S14 =>
               if FSM_MODE = '0' then
                 next_state <= S15;    -- Ka Km key pair loading mode
-              elsif FSM_MODE = '0' then
+              elsif FSM_MODE = '1' then
                 next_state <= S22;    -- Kd Ks key pair loading mode
               else
                 next_state <= S0;       -- Protection case for Z or X signals if encountered system resets and goes to state 0
@@ -181,8 +183,8 @@ begin
               CLK_ALU_CTRL <= '0';  -- Disable Clock for ALU
                 
             when S3 =>              -- Set values OP code for addition in ALU and Key by FSM 
-              FSM_ALU_CTRL <= '00000'; 
-              FSM_DATA_OUT <= ENKP(63 downto 32);    --(Ka,Km)
+              FSM_ALU_CTRL <= "00000"; 
+              FSM_DATA_OUT <= std_logic_vector(ENKP(63 downto 32));    --(Ka,Km)
             
             when S4 =>             -- Enable Clock for ALU
               CLK_ALU_CTRL <= '1';
@@ -192,8 +194,8 @@ begin
                 
             when S6 =>              -- Set values OP code for multiplication in ALU and Key by FSM 
               CLK_ALU_CTRL <= '0';
-              FSM_ALU_CTRL <= '11010';         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-              FSM_DATA_OUT <= ENKP(31 downto 0);    --(Ka,Km)
+              FSM_ALU_CTRL <= "11010";         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              FSM_DATA_OUT <= std_logic_vector(ENKP(31 downto 0));    --(Ka,Km)
                 
             when S7 =>              -- Enable Clock for ALU
               CLK_ALU_CTRL <= '1';
@@ -202,8 +204,8 @@ begin
               CLK_ALU_CTRL <= '0';
                 
             when S9 =>              -- Set values OP code for Division in ALU and Key by FSM 
-              FSM_ALU_CTRL <= '00011'; 
-              FSM_DATA_OUT <= DCKP(63 downto 32);    --(Kd,Ks)
+              FSM_ALU_CTRL <= "00011"; 
+              FSM_DATA_OUT <= std_logic_vector(DCKP(63 downto 32));    --(Kd,Ks)
                 
             when S10 =>             -- Enable Clock for ALU
               CLK_ALU_CTRL <= '1';
@@ -213,8 +215,8 @@ begin
                 
             when S12 =>             -- Set values OP code for Substraction in ALU and Key by FSM 
               CLK_ALU_CTRL <= '0';
-              FSM_ALU_CTRL <= '11011';         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-              FSM_DATA_OUT <= DCKP(31 downto 0);    --(Kd,Ks)
+              FSM_ALU_CTRL <= "11011";         -- Custom Op may be needed XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              FSM_DATA_OUT <= std_logic_vector(DCKP(31 downto 0));    --(Kd,Ks)
                 
             when S13 =>              -- Enable Clock for ALU
               CLK_ALU_CTRL <= '1';
@@ -228,8 +230,8 @@ begin
               VAR <= '0';
               
             when S16 =>
-              FSM_ALU_CTRL <= '00000'; 
-              FSM_DATA_OUT <= x"00000000"    
+              FSM_ALU_CTRL <= "00000"; 
+              FSM_DATA_OUT <= x"00000000";
                 
             when S17 =>
               CLK_ALU_CTRL <= '1';
@@ -252,8 +254,8 @@ begin
               VAR <= '0';
                 
             when S23 =>
-              FSM_ALU_CTRL <= '00000'; 
-              FSM_DATA_OUT <= x"00000000"    
+              FSM_ALU_CTRL <= "00000"; 
+              FSM_DATA_OUT <= x"00000000";  
             
             when S24 =>
               CLK_ALU_CTRL <= '1';
@@ -272,12 +274,12 @@ begin
               CLK_ALU_CTRL <= '1';
                 
             when S29 =>
-              FSM_ALU_CTRL <= '11100';     --Set NOP in ALU that releses ALU from FSM Lock
+              FSM_ALU_CTRL <= "11100";     --Set NOP in ALU that releses ALU from FSM Lock
                     
             when others =>
               CLK_ALU_CTRL <= '1';       -- Default output value
-              FSM_ALU_CTRL <= '11100'; 
-              FSM_DATA_OUT <= x"00000000"
+              FSM_ALU_CTRL <= "11100"; 
+              FSM_DATA_OUT <= x"00000000";
                 
         end case;
     end process;

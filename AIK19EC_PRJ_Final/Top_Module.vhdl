@@ -9,7 +9,7 @@ entity Top_module is
     Ext_IN_B        : in std_logic_vector(31 downto 0);
     OP_EXT_IN       : in std_logic_vector(4 downto 0);
     DATA_OUT        : out std_logic_vector(31 downto 0);
-    Flags_OUT       : out std_logic_vector(3 downto 0);
+    Flags_OUT       : out std_logic_vector(3 downto 0)
   );
 end entity;
 
@@ -27,7 +27,7 @@ architecture Behavioral of Top_module is
       overflow_flag : out std_logic;
       FSM_EN_flag   : out std_logic;
       MODE_SEL_flag : out std_logic;
-      LOAD_EN_flag  : out std_logic;
+      LOAD_EN_flag  : out std_logic
     );
   end component;
 
@@ -58,60 +58,56 @@ architecture Behavioral of Top_module is
   end component;
 
 
-
-
-
-  signal MUX_DOUT : std_logic_vector(31 downto 0);
-  signal DAT_FSM : std_logic_vector(31 downto 0);
-  signal OP_FSM : std_logic;
-  signal OP_OUT : std_logic;
+  signal MUX_DOUT   : std_logic_vector(31 downto 0);
+  signal DAT_FSM    : std_logic_vector(31 downto 0);
+  signal OP_FSM     : std_logic;
+  signal OP_OUT     : std_logic;
   signal FSM_ENABLE : std_logic;
   signal FSM_MODE_SEL : std_logic;
   signal FSM_LOAD_SEL : std_logic;
-  signal CLK_ALU_IN : std_logic
-  signal CLK_CTRL : std_logic
-
+  signal CLK_ALU_IN : std_logic;
+  signal CLK_CTRL   : std_logic;
 
 
 
 begin
-  ALU : ALU_VHDL_Full_Fledged
+  ALU_M3 : ALU
     port map (
-      operand_A     => Ext_IN_A;
-      operand_B     => MUX_DOUT;
-      OP_Code       => OP_OUT;
-      result        => DATA_OUT;
-      zero_flag     => Flags_OUT(3);
-      carry_flag    => Flags_OUT(2);
-      negative_flag => Flags_OUT(1);
-      overflow_flag => Flags_OUT(0);
-      FSM_EN_flag   => FSM_ENABLE;
-      MODE_SEL_flag => FSM_MODE_SEL;
-      LOAD_EN_flag  => FSM_LOAD_SEL;
+      operand_A     => Ext_IN_A,
+      operand_B     => MUX_DOUT,
+      OP_Code       => OP_OUT,
+      result        => DATA_OUT,
+      zero_flag     => Flags_OUT(3),
+      carry_flag    => Flags_OUT(2),
+      negative_flag => Flags_OUT(1),
+      overflow_flag => Flags_OUT(0),
+      FSM_EN_flag   => FSM_ENABLE,
+      MODE_SEL_flag => FSM_MODE_SEL,
+      LOAD_EN_flag  => FSM_LOAD_SEL
     );
 
   Finite_SM : FSM
     port map (
-      clk           => Ext_CLK_IN;
-      reset         => EXT_RESET;
-      FSM_MODE      => FSM_MODE_SEL;
-      FSM_LD_EN     => FSM_LOAD_SEL;
-      FSM_EN        => FSM_ENABLE;
-      FSM_DATA_IN   => DATA_OUT;
-      FSM_ALU_CTRL  => OP_FSM;
-      CLK_ALU_CTRL  => CLK_CTRL;
-      FSM_DATA_OUT  => DAT_FSM;
+      clk           => Ext_CLK_IN,
+      reset         => EXT_RESET,
+      FSM_MODE      => FSM_MODE_SEL,
+      FSM_LD_EN     => FSM_LOAD_SEL,
+      FSM_EN        => FSM_ENABLE,
+      FSM_DATA_IN   => DATA_OUT,
+      FSM_ALU_CTRL  => OP_FSM,
+      CLK_ALU_CTRL  => CLK_CTRL,
+      FSM_DATA_OUT  => DAT_FSM
     );
 
-    MUX : MUX32
+    MUX : DualChannel32BitMux
     port map (
-      sel           => ENABLE_FSM;
-      channelA0     => Ext_IN_B;
-      channelA1     => DAT_FSM;
-      channelB0     => OP_EXT_IN;
-      channelB1     => OP_FSM
-      outputA       => MUX_DOUT;
-      outputB       => OP_OUT;
+      sel           => ENABLE_FSM,
+      channelA0     => Ext_IN_B,
+      channelA1     => DAT_FSM,
+      channelB0     => OP_EXT_IN,
+      channelB1     => OP_FSM,
+      outputA       => MUX_DOUT,
+      outputB       => OP_OUT
     );
 
   CLK_ALU_IN <= Ext_CLK_IN and CLK_CTRL;

@@ -12,9 +12,9 @@ entity ALU is
         OP_Code       : in  std_logic_vector(4 downto 0);
         result        : out std_logic_vector(DATA_WIDTH - 1 downto 0);
         zero_flag     : out std_logic;
-        carry_flag    : out std_logic;
+        carry_flag    : inout std_logic;
+        overflow_flag : inout std_logic;
         negative_flag : out std_logic;
-        overflow_flag : out std_logic;
         FSM_EN_flag   : out std_logic;
         MODE_SEL_flag : out std_logic;
         LOAD_EN_flag  : out std_logic
@@ -79,19 +79,20 @@ begin
 
             when "01000" =>
                 -- Logical Shift Left
-                temp_result := shift_left(operand_A, to_integer(unsigned(operand_B)));
+                temp_result := std_logic_vector(shift_left(unsigned(operand_A), to_integer(unsigned(operand_B))));
                 temp_carry  := '0';
                 temp_overflow := '0';
 
             when "01001" =>
                 -- Logical Shift Right
-                temp_result := shift_right_logical(operand_A, to_integer(unsigned(operand_B)));
+                --temp_result := '0' & operand_A(operand_A'high downto operand_B);
+                temp_result := '0' & operand_A(unsigned(operand_A)'high downto to_integer(unsigned(operand_B)));
                 temp_carry  := '0';
                 temp_overflow := '0';
 
             when "01010" =>
                 -- Arithmetic Shift Right
-                temp_result := shift_right(operand_A, to_integer(unsigned(operand_B)));
+                temp_result := std_logic_vector(shift_right(unsigned(operand_A), to_integer(unsigned(operand_B))));
                 temp_carry  := '0';
                 temp_overflow := '0';
 
@@ -157,13 +158,13 @@ begin
 
             when "10001" =>
                 -- Rotate Left
-                temp_result := rotate_left(operand_A, to_integer(unsigned(operand_B)));
+                temp_result := std_logic_vector(rotate_left(unsigned(operand_A), to_integer(unsigned(operand_B))));
                 temp_carry := '0';
                 temp_overflow := '0';
 
             when "10010" =>
                 -- Rotate Right
-                temp_result := rotate_right(operand_A, to_integer(unsigned(operand_B)));
+                temp_result := std_logic_vector(rotate_right(unsigned(operand_A), to_integer(unsigned(operand_B))));
                 temp_carry := '0';
                 temp_overflow := '0';
 
@@ -181,34 +182,34 @@ begin
 
             when "10101" =>
                 -- DAMS Encrypt
-                FSM_EN_flag := 1;
-                MODE_SEL_flag := 0;
-                LOAD_EN_flag := 0;
+                FSM_EN_flag <= '1';
+                MODE_SEL_flag <= '0';
+                LOAD_EN_flag <= '0';
 
             when "10110" =>
                 -- DAMS Decrypt
-                FSM_EN_flag := 1;
-                MODE_SEL_flag := 1;
-                LOAD_EN_flag := 0;
+                FSM_EN_flag <= '1';
+                MODE_SEL_flag <= '1';
+                LOAD_EN_flag <= '0';
 
             when "10111" =>
                 -- DAMS Encrypt Key Load
-                LOAD_EN_flag := 1;
-                FSM_EN_flag := 1;
-                MODE_SEL_flag := 0;
+                LOAD_EN_flag <= '1';
+                FSM_EN_flag <= '1';
+                MODE_SEL_flag <= '0';
 
             when "11000" =>
                 -- DAMS Decrypt Key Load
-                LOAD_EN_flag := 1;
-                FSM_EN_flag := 1;
-                MODE_SEL_flag := 1;
+                LOAD_EN_flag <= '1';
+                FSM_EN_flag <= '1';
+                MODE_SEL_flag <= '1';
 
             when "11001" =>
-                -- DAMS Disable and exit Similar to NOP but output is set to 0
+                -- DAMS Disable and exit, Similar to NOP but output is set to 0
                 temp_result := x"00000000";
-                LOAD_EN_flag := 0;
-                FSM_EN_flag := 0;
-                MODE_SEL_flag := 0;
+                LOAD_EN_flag <= '0';
+                FSM_EN_flag <= '0';
+                MODE_SEL_flag <= '0';
                 
             when "11010" =>
                 -- DAMS Encrypt Key Load Alt Function
@@ -221,9 +222,9 @@ begin
             when "11100" =>
                 -- NOP Function
                 temp_result := operand_A;
-                LOAD_EN_flag := 0;
-                FSM_EN_flag := 0;
-                MODE_SEL_flag := 0;
+                LOAD_EN_flag <= '0';
+                FSM_EN_flag <= '0';
+                MODE_SEL_flag <= '0';
 
             when others =>
                 -- Default case
@@ -233,7 +234,13 @@ begin
         end case;
 
         result        <= temp_result;
-        zero_flag     <= '1' when temp_result = (others => '0') else '0';
+        --zero_flag     <= '1' when (temp_result = x"00000000") else '0';
+        --zero_flag     <= '1' when ((not (temp_result(temp_result'high) or temp_result(temp_result'high-1 downto 0))) = '1') else '0';
+        if temp_result = x"00000000" then
+            zero_flag   <= '1';
+        else
+            zero_flag   <= '0';
+        end if;
         carry_flag    <= temp_carry;
         negative_flag <= temp_result(DATA_WIDTH - 1);
         overflow_flag <= temp_overflow;

@@ -8,7 +8,7 @@ entity DualChannel32BitMux is
         channelA1 : in  std_logic_vector(31 downto 0);
         channelB0 : in  std_logic_vector(4 downto 0);
         channelB1 : in  std_logic_vector(4 downto 0);
-        outputA   : out std_logic_vector(31 downto 0)
+        outputA   : out std_logic_vector(31 downto 0);
         outputB   : out std_logic_vector(4 downto 0)
     );
 end entity DualChannel32BitMux;

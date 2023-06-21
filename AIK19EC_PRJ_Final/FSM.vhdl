@@ -37,6 +37,8 @@ begin
     begin
         if reset = '1' then
             current_state <= S0;
+            FSM_DATA_OUT  <= x"00000000";
+            FSM_ALU_CTRL  <= b"00000";
         elsif rising_edge(clk) then
             current_state <= next_state;
         end if;

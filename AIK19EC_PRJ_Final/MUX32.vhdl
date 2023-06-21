@@ -17,7 +17,7 @@ end entity DualChannel32BitMux;
 
 architecture behavioral of DualChannel32BitMux is
 begin
-    process (MUX_CLK, sel)
+    process (MUX_CLK, sel, channelA0, channelA1, channelB0, channelB1) 
     begin
         if rising_edge(MUX_CLK)then
             if MUX_RST = '1' then

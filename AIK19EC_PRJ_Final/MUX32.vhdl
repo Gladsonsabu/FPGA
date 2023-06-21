@@ -21,8 +21,8 @@ begin
     begin
         if rising_edge(MUX_CLK)then
             if MUX_RST = '1' then
-                outputA <= x"00000000";
-                outputB <= b"00000";
+                outputA <= channelA0;
+                outputB <= channelB0;
             elsif sel = '0' then
                 outputA <= channelA0;
                 outputB <= channelB0;

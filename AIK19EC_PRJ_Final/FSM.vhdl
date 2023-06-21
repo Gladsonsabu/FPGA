@@ -176,6 +176,7 @@ begin
             when S0 =>
               CLK_ALU_CTRL <= '1';   -- System ALU CLK is enabled by default for ALU to work Normally
               FSM_DATA_OUT <= x"00000000";
+              FSM_ALU_CTRL  <= b"00000";
                 
             when S1 =>
               CLK_ALU_CTRL <= '1';  -- No output change is needed

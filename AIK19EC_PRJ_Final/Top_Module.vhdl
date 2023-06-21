@@ -3,13 +3,13 @@ use ieee.std_logic_1164.all;
 
 entity Top_module is
   port (
-    Ext_CLK_IN      : in std_logic;
+    EXT_CLK_IN      : in std_logic;
     EXT_RESET       : in std_logic;
-    Ext_IN_A        : in std_logic_vector(31 downto 0);
-    Ext_IN_B        : in std_logic_vector(31 downto 0);
+    EXT_IN_A        : in std_logic_vector(31 downto 0);
+    EXT_IN_B        : in std_logic_vector(31 downto 0);
     OP_EXT_IN       : in std_logic_vector(4 downto 0);
     DATA_OUT        : out std_logic_vector(31 downto 0);
-    Flags_OUT       : inout std_logic_vector(3 downto 0)
+    Flags_OUT       : out std_logic_vector(3 downto 0)
   );
 end entity;
 
@@ -17,13 +17,15 @@ architecture Behavioral of Top_module is
 
   component ALU is
     port (
+      ALU_CLK       : in  std_logic;
+      ALU_RST       : in  std_logic;
       operand_A     : in  std_logic_vector(31 downto 0);
       operand_B     : in  std_logic_vector(31 downto 0);
       OP_Code       : in  std_logic_vector(4 downto 0);
       result        : out std_logic_vector(31 downto 0);
       zero_flag     : out std_logic;
-      carry_flag    : inout std_logic;
-      overflow_flag : inout std_logic;
+      carry_flag    : out std_logic;
+      overflow_flag : out std_logic;
       negative_flag : out std_logic;
       FSM_EN_flag   : out std_logic;
       MODE_SEL_flag : out std_logic;
@@ -47,6 +49,8 @@ architecture Behavioral of Top_module is
 
   component DualChannel32BitMux is 
     port (
+      MUX_CLK       : in  std_logic;
+      MUX_RST       : in  std_logic;
       sel           : in  std_logic;
       channelA0     : in  std_logic_vector(31 downto 0);
       channelA1     : in  std_logic_vector(31 downto 0);
@@ -74,7 +78,9 @@ architecture Behavioral of Top_module is
 begin
   ALU_M3 : ALU
     port map (
-      operand_A     => Ext_IN_A,
+      ALU_CLK       => EXT_CLK_IN,
+      ALU_RST       => EXT_RESET,
+      operand_A     => EXT_IN_A,
       operand_B     => MUX_DOUT,
       OP_Code       => OP_OUT,
       result        => INTERM_OUT,
@@ -89,7 +95,7 @@ begin
 
   Finite_SM : FSM
     port map (
-      clk           => Ext_CLK_IN,
+      clk           => EXT_CLK_IN,
       reset         => EXT_RESET,
       FSM_MODE      => FSM_MODE_SEL,
       FSM_LD_EN     => FSM_LOAD_SEL,
@@ -102,17 +108,19 @@ begin
 
     MUX : DualChannel32BitMux
     port map (
+      MUX_CLK       => EXT_CLK_IN,
+      MUX_RST       => EXT_RESET,
       sel           => FSM_ENABLE,
-      channelA0     => Ext_IN_B,
+      channelA0     => EXT_IN_B,
       channelA1     => DAT_FSM,
       channelB0     => OP_EXT_IN,
       channelB1     => OP_FSM,
       outputA       => MUX_DOUT,
       outputB       => OP_OUT
     );
-    process(Ext_CLK_IN)                             --INTERM_OUT can be a parameter
+    process(EXT_CLK_IN)                             --INTERM_OUT can be a parameter
     begin
-        CLK_ALU_IN <= Ext_CLK_IN and CLK_CTRL;
+        CLK_ALU_IN <= EXT_CLK_IN and CLK_CTRL;
         DATA_OUT   <= INTERM_OUT;
     end process;
 end architecture Behavioral;

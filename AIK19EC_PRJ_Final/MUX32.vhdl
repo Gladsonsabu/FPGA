@@ -3,7 +3,6 @@ use ieee.std_logic_1164.all;
 
 entity DualChannel32BitMux is
     port (
-        MUX_CLK   : in  std_logic;
         MUX_RST   : in  std_logic;
         sel       : in  std_logic;
         channelA0 : in  std_logic_vector(31 downto 0);
@@ -17,9 +16,9 @@ end entity DualChannel32BitMux;
 
 architecture behavioral of DualChannel32BitMux is
 begin
-    process (MUX_CLK, sel, channelA0, channelA1, channelB0, channelB1) 
+
+    Data_Proc: process (sel, channelA0, channelA1, channelB0, channelB1)  -- This should be asynchronous with clock signals or else the design will fail due to timing constrains
     begin
-        if rising_edge(MUX_CLK)then
             if MUX_RST = '1' then
                 outputA <= channelA0;
                 outputB <= channelB0;
@@ -30,6 +29,5 @@ begin
                 outputA <= channelA1;
                 outputB <= channelB1;
             end if;
-        end if;
-    end process;
+    end process Data_Proc;
 end architecture behavioral;

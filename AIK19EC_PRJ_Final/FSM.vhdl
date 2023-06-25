@@ -153,6 +153,7 @@ begin
                 FSM_OP <= b"00000";
                 FSM_DOUT <= x"00000000";
                 FSM_DONE <= '0';
+                VAR <= '1';
                 KD <= DATA_IN;
             when S10 =>
                 FSM_OP <= b"00000";

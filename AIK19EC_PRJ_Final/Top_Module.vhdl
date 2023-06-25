@@ -8,8 +8,9 @@ entity Top_module is
     EXT_IN_A        : in std_logic_vector(31 downto 0);
     EXT_IN_B        : in std_logic_vector(31 downto 0);
     OP_EXT_IN       : in std_logic_vector(4 downto 0);
-    DATA_OUT        : out std_logic_vector(31 downto 0);
-    Flags_OUT       : out std_logic_vector(3 downto 0)
+    DATA_OUT        : inout std_logic_vector(31 downto 0);
+    Flags_OUT       : out std_logic_vector(3 downto 0);
+    FSM_STAT        : out std_logic
   );
 end entity;
 
@@ -33,19 +34,19 @@ architecture Behavioral of Top_module is
     );
   end component ALU;
 
-  component FSM is
+  component FSM_DAMS is
     port (
-      clk           : in  std_logic;
-      reset         : in  std_logic;
-      FSM_MODE      : in  std_logic;
-      FSM_LD_EN     : in  std_logic;
-      FSM_EN        : in  std_logic;
-      FSM_DATA_IN   : in  std_logic_vector(31 downto 0);
-      FSM_ALU_CTRL  : out std_logic_vector(4 downto 0);
-      CLK_ALU_CTRL  : out std_logic;
-      FSM_DATA_OUT  : out std_logic_vector(31 downto 0)
+      CLK_IN : in STD_LOGIC;
+      FSM_RST : in STD_LOGIC;
+      FSM_EN : in STD_LOGIC;
+      Load_EN : in STD_LOGIC;
+      Mode_SEL : in STD_LOGIC;
+      DATA_IN : in STD_LOGIC_VECTOR (31 downto 0);
+      FSM_OP : out STD_LOGIC_VECTOR (4 downto 0);
+      FSM_DOUT : out STD_LOGIC_VECTOR (31 downto 0);
+      FSM_DONE : out STD_LOGIC  
     );
-  end component FSM;
+  end component FSM_DAMS;
 
   component DualChannel32BitMux is 
     port (
@@ -62,16 +63,15 @@ architecture Behavioral of Top_module is
   end component DualChannel32BitMux;
 
 
-  signal MUX_DOUT   : std_logic_vector(31 downto 0);
-  signal DAT_FSM    : std_logic_vector(31 downto 0);
-  signal INTERM_OUT : std_logic_vector(31 downto 0);
-  signal OP_OUT     : std_logic_vector(4 downto 0);
-  signal OP_FSM     : std_logic_vector(4 downto 0);
-  signal FSM_ENABLE : std_logic;
-  signal FSM_MODE_SEL : std_logic;
-  signal FSM_LOAD_SEL : std_logic;
-  signal CLK_ALU_IN : std_logic;
-  signal CLK_CTRL   : std_logic;
+  signal MUX_DOUT   : std_logic_vector(31 downto 0) := (others => '0');
+  signal DAT_FSM    : std_logic_vector(31 downto 0) := (others => '0');
+  signal OP_OUT     : std_logic_vector(4 downto 0) := (others => '0');
+  signal OP_FSM     : std_logic_vector(4 downto 0) := (others => '0');
+  signal FSM_ENABLE : std_logic := '0';
+  signal FSM_MODE_SEL : std_logic := '0';
+  signal FSM_LOAD_SEL : std_logic := '0';
+  signal CLK_ALU_IN : std_logic := '0';
+  signal CLK_CTRL   : std_logic := '0';
 
 
 
@@ -83,7 +83,7 @@ begin
       operand_A     => EXT_IN_A,
       operand_B     => MUX_DOUT,
       OP_Code       => OP_OUT,
-      result        => INTERM_OUT,
+      result        => DATA_OUT,
       zero_flag     => Flags_OUT(3),
       carry_flag    => Flags_OUT(2),
       negative_flag => Flags_OUT(1),
@@ -93,17 +93,17 @@ begin
       LOAD_EN_flag  => FSM_LOAD_SEL
     );
 
-  Finite_SM : FSM
+  Finite_SM : FSM_DAMS
     port map (
-      clk           => EXT_CLK_IN,
-      reset         => EXT_RESET,
-      FSM_MODE      => FSM_MODE_SEL,
-      FSM_LD_EN     => FSM_LOAD_SEL,
+      CLK_IN        => EXT_CLK_IN,
+      FSM_RST       => EXT_RESET,
       FSM_EN        => FSM_ENABLE,
-      FSM_DATA_IN   => INTERM_OUT,
-      FSM_ALU_CTRL  => OP_FSM,
-      CLK_ALU_CTRL  => CLK_CTRL,
-      FSM_DATA_OUT  => DAT_FSM
+      Load_EN       => FSM_LOAD_SEL,
+      Mode_SEL      => FSM_MODE_SEL,
+      DATA_IN       => DATA_OUT,
+      FSM_OP        => OP_FSM,
+      FSM_DOUT      => DAT_FSM,
+      FSM_DONE      => FSM_STAT
     );
 
     MUX : DualChannel32BitMux
@@ -118,9 +118,5 @@ begin
       outputA       => MUX_DOUT,
       outputB       => OP_OUT
     );
-    process(EXT_CLK_IN)                             --INTERM_OUT can be a parameter
-    begin
-        CLK_ALU_IN <= EXT_CLK_IN and CLK_CTRL;
-        DATA_OUT   <= INTERM_OUT;
-    end process;
+
 end architecture Behavioral;

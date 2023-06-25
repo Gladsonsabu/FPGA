@@ -69,10 +69,6 @@ architecture Behavioral of Top_module is
   signal FSM_ENABLE : std_logic := '0';
   signal FSM_MODE_SEL : std_logic := '0';
   signal FSM_LOAD_SEL : std_logic := '0';
-  signal CLK_ALU_IN : std_logic := '0';
-  signal CLK_CTRL   : std_logic := '0';
-
-
 
 begin
   ALU_M3 : ALU

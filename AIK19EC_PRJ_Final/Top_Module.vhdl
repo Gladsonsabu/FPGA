@@ -50,7 +50,6 @@ architecture Behavioral of Top_module is
 
   component DualChannel32BitMux is 
     port (
-      MUX_CLK       : in  std_logic;
       MUX_RST       : in  std_logic;
       sel           : in  std_logic;
       channelA0     : in  std_logic_vector(31 downto 0);
@@ -108,7 +107,6 @@ begin
 
     MUX : DualChannel32BitMux
     port map (
-      MUX_CLK       => EXT_CLK_IN,
       MUX_RST       => EXT_RESET,
       sel           => FSM_ENABLE,
       channelA0     => EXT_IN_B,
